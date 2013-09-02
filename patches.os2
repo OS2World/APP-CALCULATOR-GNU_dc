@@ -1,0 +1,112 @@
+Only in new: Makefile
+Only in new: patches.os2
+diff -cb orig/dc.c new/dc.c
+*** orig/dc.c	Wed May 19 16:30:20 1993
+--- new/dc.c	Sat May 22 14:25:42 1993
+***************
+*** 20,25 ****
+--- 20,28 ----
+   */
+  
+  #include <stdio.h>
++ #ifdef __EMX__
++ #include <stdlib.h>
++ #endif
+  #include "decimal.h"  /* definitions for our decimal arithmetic package */
+  
+  FILE *open_file;	/* input file now open */
+***************
+*** 90,100 ****
+--- 93,107 ----
+  void free_regstack ();
+  void pushreg ();
+  void execute ();
++ #ifndef __EMX__
+  void fputchar ();
++ #endif
+  void push ();
+  void incref ();
+  void decref ();
+  void binop ();
++ void *xmalloc ();
++ void *xrealloc ();
+  
+  main (argc, argv, env)
+       int argc;
+***************
+*** 661,672 ****
+--- 668,681 ----
+    return getchar ();
+  }
+  
++ #ifndef __EMX__
+  void
+  fputchar (c)
+       char (c);
+  {
+    putchar (c);
+  }
++ #endif
+  
+  /* Read text from command input source up to a close-bracket,
+     make a string out of it, and return it.
+***************
+*** 857,864 ****
+--- 866,875 ----
+  perror_with_name (name)
+       char *name;
+  {
++ #ifndef __EMX__
+    extern int errno, sys_nerr;
+    extern char *sys_errlist[];
++ #endif
+    char *s;
+  
+    if (errno < sys_nerr)
+***************
+*** 887,908 ****
+  
+  /* Like malloc but get fatal error if memory is exhausted.  */
+  
+! int
+  xmalloc (size)
+       int size;
+  {
+!   int result = malloc (size);
+    if (!result)
+      fatal ("virtual memory exhausted", 0);
+    return result;
+  }
+  
+! int
+  xrealloc (ptr, size)
+!      char *ptr;
+       int size;
+  {
+!   int result = realloc (ptr, size);
+    if (!result)
+      fatal ("virtual memory exhausted");
+    return result;
+--- 898,919 ----
+  
+  /* Like malloc but get fatal error if memory is exhausted.  */
+  
+! void *
+  xmalloc (size)
+       int size;
+  {
+!   void *result = malloc (size);
+    if (!result)
+      fatal ("virtual memory exhausted", 0);
+    return result;
+  }
+  
+! void *
+  xrealloc (ptr, size)
+!      void *ptr;
+       int size;
+  {
+!   void *result = realloc (ptr, size);
+    if (!result)
+      fatal ("virtual memory exhausted");
+    return result;
